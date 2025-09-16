@@ -3,142 +3,442 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Моя Биография</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Расписание уроков</title>
     <style>
-        /* Основной шрифт для сайта, похожий на шрифты в редакторах кода */
+        :root {
+            --bg-color: #1c1c1e;
+            --surface-color: #2c2c2e;
+            --primary-color: #a4c9f7;
+            --text-color: #f0f0f0;
+            --text-secondary-color: #b0b0b0;
+            --border-radius-large: 28px;
+            --border-radius-small: 16px;
+        }
         body {
-            font-family: 'Fira Code', monospace;
-            background-color: #212121; /* Темный фон */
-            color: #e0e0e0; /* Светлый текст */
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
         }
-        /* Класс для предотвращения прокрутки фона */
-        .overflow-hidden {
-            overflow: hidden;
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background-color: var(--surface-color);
+            border-radius: var(--border-radius-large);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            padding: 24px;
+            box-sizing: border-box;
         }
-        .bio-card {
-            background-color: #2d2d2d;
-            border-radius: 1rem; /* Меньший радиус для более строгого вида */
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s ease;
-        }
-        .bio-card:hover {
-            transform: translateY(-3px);
-        }
-        .profile-img {
-            border-radius: 50%;
-            border: 4px solid #424242;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        .btn-link {
-            display: inline-block;
-            padding: 0.5rem 1.5rem;
-            border-radius: 0.5rem; /* Прямые углы */
-            background-color: #84a59d;
-            color: #ffffff;
-            font-weight: 600;
+        h1 {
+            font-size: 24px;
+            font-weight: 500;
+            color: var(--text-color);
+            margin-bottom: 24px;
             text-align: center;
-            transition: background-color 0.3s ease, transform 0.2s ease;
         }
-        .btn-link:hover {
-            background-color: #6a8880;
-            transform: scale(1.02);
+        .class-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
-        .link-text {
-            color: #84a59d;
-            transition: color 0.3s ease;
+        .class-selector button {
+            border: none;
+            border-radius: var(--border-radius-small);
+            padding: 10px 15px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s, color 0.3s;
         }
-        .link-text:hover {
-            color: #b0c9c3;
+        
+        /* Цвета для классов "тех" */
+        .class-selector .btn-tech {
+            background-color: #4a4a4a;
+            color: #a4c9f7;
+        }
+        .class-selector .btn-tech.active {
+            background-color: #a4c9f7;
+            color: #3b3b3d;
+        }
+        
+        /* Цвета для классов "ест" */
+        .class-selector .btn-est {
+            background-color: #4a4a4a;
+            color: #4CAF50;
+        }
+        .class-selector .btn-est.active {
+            background-color: #4CAF50;
+            color: #fff;
+        }
+
+        /* Цвета для расписания звонков (красный) */
+        .class-selector .btn-bells {
+            background-color: #4a4a4a;
+            color: #FF5252;
+        }
+        .class-selector .btn-bells.active {
+            background-color: #FF5252;
+            color: #fff;
+        }
+
+        .schedule-container {
+            width: 100%;
+        }
+        .schedule-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+        .schedule-table th, .schedule-table td {
+            text-align: left;
+            padding: 12px 16px;
+            background-color: var(--bg-color);
+            border-radius: var(--border-radius-small);
+            font-size: 16px;
+            color: var(--text-secondary-color);
+        }
+        .schedule-table th {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 14px;
+            text-transform: uppercase;
+            padding: 16px;
+            background-color: #3b3b3d;
+            border-radius: var(--border-radius-small);
+        }
+        .day-header {
+            font-weight: 600;
+            color: var(--surface-color);
+            font-size: 18px;
+            text-transform: capitalize;
+            background-color: var(--primary-color);
+            border-radius: var(--border-radius-small);
+            text-align: center;
+            padding-top: 15px;
+            padding-bottom: 15px;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+            .schedule-table th, .schedule-table td {
+                padding: 8px 12px;
+            }
+            body {
+                padding: 12px;
+            }
+        }
+        .class-schedule {
+            display: none;
+        }
+        .class-schedule.visible {
+            display: block;
+        }
+        .empty-cell {
+            font-style: italic;
+            opacity: 0.6;
+        }
+
+        .bells-table td {
+            text-align: center;
+            color: var(--text-color);
+            font-size: 18px;
+        }
+        .bells-table .lesson-time {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        .bells-table .break-time {
+            font-style: italic;
+            color: #FF5252;
         }
     </style>
 </head>
-<body class="bg-gray-900 text-gray-200">
+<body>
 
-    <div class="container mx-auto p-4 md:p-8 flex flex-col items-center justify-center min-h-screen">
+<div class="container">
+    <h1>Расписание</h1>
 
-        <!-- Основная секция биографии -->
-        <div id="bio-section" class="w-full max-w-xl">
-            <div class="bio-card p-8 md:p-12 mb-8 w-full">
-                <div class="flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8">
-                    <!-- Заменяем URL изображения на старый -->
-                    <img src="https://placehold.co/150x150/555555/e0e0e0?text=Аватар" alt="Фото профиля" class="w-36 h-36 object-cover profile-img">
-                    <div class="text-center md:text-left">
-                        <h1 class="text-3xl font-bold text-gray-50">qunte</h1>
-                        <p class="text-xl text-gray-400 mt-2">Краткое описание, например: Веб-разработчик и любитель кофе</p>
-                        <button id="contact-button" class="btn-link mt-4 focus:outline-none">Связаться со мной</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="bio-card p-8 md:p-12 w-full">
-                <h2 class="text-2xl font-bold text-gray-50 mb-4">Обо мне</h2>
-                <p class="text-gray-400 leading-relaxed mb-4">
-                    Здесь вы можете написать свою биографию. Расскажите о себе, своих увлечениях, достижениях, профессиональном опыте и целях. Сделайте этот текст уникальным, чтобы он отражал вашу личность.
-                </p>
-                <p class="text-gray-400 leading-relaxed">
-                    Например, можно рассказать, как вы начали свой путь в определенной сфере, что вас вдохновляет, и какие проекты вы хотели бы реализовать в будущем.
-                </p>
-            </div>
-        </div>
-
+    <div class="class-selector">
+        <button onclick="showSchedule('10-tech')" class="btn-tech">10 тех</button>
+        <button onclick="showSchedule('10-est')" class="btn-est">10 ест</button>
+        <button onclick="showSchedule('11-tech')" class="btn-tech">11 тех</button>
+        <button onclick="showSchedule('11-est')" class="btn-est">11 ест</button>
+        <button onclick="showSchedule('bells')" class="btn-bells">Расписание звонков</button>
     </div>
 
-    <!-- Модальное окно с контактами -->
-    <div id="contact-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300 z-50">
-<!-- Ключевое изменение: p-4 вместо p-6 -->
-        <div class="bio-card p-4 w-11/12 max-w-xs text-center">
-            <h2 class="text-lg font-bold text-gray-50 mb-4">Мои контакты</h2>
-            <div class="space-y-4">
-                <p class="text-gray-400 text-sm">
-                    <span class="font-semibold">Телефон:</span>
-                    <a href="tel:+79955793271" class="link-text block mt-1">+7 (995) 579-32-71</a>
-                </p>
-                <p class="text-gray-400 text-sm">
-                    <span class="font-semibold">Telegram:</span>
-                    <a href="https://t.me/project_qunte" target="_blank" class="link-text block mt-1">@project_qunte</a>
-                </p>
-            </div>
-            <button id="back-button" class="btn-link mt-6 focus:outline-none">Назад</button>
-        </div>
+    <div id="10-tech" class="class-schedule">
+        <table class="schedule-table">
+            <tr><td colspan="1" class="day-header">Понедельник</td></tr>
+            <tr><td>РОВ</td></tr>
+            <tr><td>Физ-ра</td></tr>
+            <tr><td>физика</td></tr>
+            <tr><td>Алгебра</td></tr>
+            <tr><td>История</td></tr>
+            <tr><td>Литература</td></tr>
+            <tr><td>ПРЗ физ</td></tr>
+            <tr><td>проект</td></tr>
+            <tr><td>Прз инф</td></tr>
+            <tr><td colspan="1" class="day-header">Вторник</td></tr>
+            <tr><td>География</td></tr>
+            <tr><td>Алгебра</td></tr>
+            <tr><td>Русский яз.</td></tr>
+            <tr><td>Физика</td></tr>
+            <tr><td>Физика</td></tr>
+            <tr><td>Иностранный</td></tr>
+            <tr><td>Физ-ра</td></tr>
+            <tr><td colspan="1" class="day-header">Среда</td></tr>
+            <tr><td>Информатика</td></tr>
+            <tr><td>Геометр</td></tr>
+            <tr><td>Литература</td></tr>
+            <tr><td>Химия</td></tr>
+            <tr><td>Вер и стат.</td></tr>
+            <tr><td>ОБЗР</td></tr>
+            <tr><td>Обществознание</td></tr>
+            <tr><td>ПРЗ мат</td></tr>
+            <tr><td>ОФП</td></tr>
+            <tr><td colspan="1" class="day-header">Четверг</td></tr>
+            <tr><td>Иностранный</td></tr>
+            <tr><td>История</td></tr>
+            <tr><td>Физика</td></tr>
+            <tr><td>Обществознание</td></tr>
+            <tr><td>Алгебра</td></tr>
+            <tr><td>Русский</td></tr>
+            <tr><td>Геометр</td></tr>
+            <tr><td>РМГ</td></tr>
+            <tr><td colspan="1" class="day-header">Пятница</td></tr>
+            <tr><td>Иностранный</td></tr>
+            <tr><td>Алгебра</td></tr>
+            <tr><td>Физика</td></tr>
+            <tr><td>Литература</td></tr>
+            <tr><td>Геометр</td></tr>
+            <tr><td>Биолог</td></tr>
+            <tr><td>ПРЗ инф</td></tr>
+            <tr><td>Функц. гр.</td></tr>
+            <tr><td>черчение</td></tr>
+        </table>
+    </div>
+    
+    <div id="10-est" class="class-schedule">
+        <table class="schedule-table">
+            <tr><td colspan="1" class="day-header">Понедельник</td></tr>
+            <tr><td>РОВ</td></tr>
+            <tr><td>физ-ра</td></tr>
+            <tr><td>химия</td></tr>
+            <tr><td>Алгебра</td></tr>
+            <tr><td>История</td></tr>
+            <tr><td>Литература</td></tr>
+            <tr><td>Проект б/б</td></tr>
+            <tr><td>Хим в зад</td></tr>
+            <tr><td>Тр в биол</td></tr>
+            <tr><td colspan="1" class="day-header">Вторник</td></tr>
+            <tr><td>Алгебра</td></tr>
+            <tr><td>химия</td></tr>
+            <tr><td>Биолог</td></tr>
+            <tr><td>Химия</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td>физ-ра</td></tr>
+            <tr><td>БСИЗ</td></tr>
+            <tr><td>Культура речи</td></tr>
+            <tr><td colspan="1" class="day-header">Среда</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td>Алгебра</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td>Геометр</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td>Сл в мат</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td colspan="1" class="day-header">Четверг</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td>Биолог</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td>Физика</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td>Биолог</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td colspan="1" class="day-header">Пятница</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td>Геометр</td></tr>
+            <tr><td>ПРЗ Хим</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td>Физика</td></tr>
+            <tr><td>Биопракт</td></tr>
+            <tr><td>Функц гр</td></tr>
+            <tr><td>Тр в хим</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+        </table>
     </div>
 
-    <!-- Футер с копирайтом -->
-    <footer class="text-center text-gray-500 py-6">
-        <p>&copy; <span id="year"></span> qunte. All Rights Reserved.</p>
-    </footer>
+    <div id="11-tech" class="class-schedule">
+        <table class="schedule-table">
+            <tr><td colspan="1" class="day-header">Понедельник</td></tr>
+            <tr><td>РОВ</td></tr>
+            <tr><td>Физика</td></tr>
+            <tr><td>Иностр. яз.</td></tr>
+            <tr><td>Алгебра</td></tr>
+            <tr><td>геометр.</td></tr>
+            <tr><td>Реш. мат.</td></tr>
+            <tr><td>Культура речи</td></tr>
+            <tr><td>ОФП</td></tr>
+            <tr><td colspan="1" class="day-header">Вторник</td></tr>
+            <tr><td>Литература</td></tr>
+            <tr><td>Физика</td></tr>
+            <tr><td>Русский яз.</td></tr>
+            <tr><td>Алгебра</td></tr>
+            <tr><td>Информатика</td></tr>
+            <tr><td>Иностранный</td></tr>
+            <tr><td>Проект</td></tr>
+            <tr><td>ПРЗ инф</td></tr>
+            <tr><td colspan="1" class="day-header">Среда</td></tr>
+            <tr><td>Физ-ра</td></tr>
+            <tr><td>Физика</td></tr>
+            <tr><td>Физика</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td>Обществознание</td></tr>
+            <tr><td>ПРЗ физ</td></tr>
+            <tr><td>ОБЗР</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td colspan="1" class="day-header">Четверг</td></tr>
+            <tr><td>Вер и стат.</td></tr>
+            <tr><td>Алгебра</td></tr>
+            <tr><td>Геометр.</td></tr>
+            <tr><td>Биолог.</td></tr>
+            <tr><td>Русский</td></tr>
+            <tr><td>Физика</td></tr>
+            <tr><td>Литература</td></tr>
+            <tr><td>РМГ</td></tr>
+            <tr><td colspan="1" class="day-header">Пятница</td></tr>
+            <tr><td>Физ-ра</td></tr>
+            <tr><td>Иностранный</td></tr>
+            <tr><td>Химия</td></tr>
+            <tr><td>Алгебра</td></tr>
+            <tr><td>Обществознание</td></tr>
+            <tr><td>геометр</td></tr>
+            <tr><td>География</td></tr>
+            <tr><td>ПРЗ инф</td></tr>
+            <tr><td>Функц гр</td></tr>
+            <tr><td>черчение</td></tr>
+        </table>
+    </div>
 
-    <script>
-        // Обновляем год в футере
-        document.getElementById('year').textContent = new Date().getFullYear();
+    <div id="11-est" class="class-schedule">
+        <table class="schedule-table">
+            <tr><td colspan="1" class="day-header">Понедельник</td></tr>
+            <tr><td>РОВ</td></tr>
+            <tr><td>Химия</td></tr>
+            <tr><td>Иностр. яз.</td></tr>
+            <tr><td>биолог</td></tr>
+            <tr><td>БСИЗ</td></tr>
+            <tr><td>Проект б/б</td></tr>
+            <tr><td>Культура речи</td></tr>
+            <tr><td>ОФП</td></tr>
+            <tr><td colspan="1" class="day-header">Вторник</td></tr>
+            <tr><td>Литература</td></tr>
+            <tr><td>Химия</td></tr>
+            <tr><td>Биолог.</td></tr>
+            <tr><td>Биолог.</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td>Функц. гр.</td></tr>
+            <tr><td>Хим в зад</td></tr>
+            <tr><td colspan="1" class="day-header">Среда</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td>химия</td></tr>
+            <tr><td>Алгебра</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td>Геометр.</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td>Тр в хим</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td colspan="1" class="day-header">Четверг</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td>Биолог</td></tr>
+            <tr><td>ПРЗ Хим</td></tr>
+            <tr><td>Алгебра</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td>Физика</td></tr>
+            <tr><td>Литература</td></tr>
+            <tr><td>РМГ</td></tr>
+            <tr><td colspan="1" class="day-header">Пятница</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td>геометр</td></tr>
+            <tr><td>Биопракт</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td>Физика</td></tr>
+            <tr><td class="empty-cell">(нет)</td></tr>
+            <tr><td>Тр в био</td></tr>
+            <tr><td>Сл в мат</td></tr>
+        </table>
+    </div>
 
-        // Логика модального окна
-        const contactModal = document.getElementById('contact-modal');
-        const contactButton = document.getElementById('contact-button');
-        const backButton = document.getElementById('back-button');
+    <div id="bells" class="class-schedule">
+        <table class="schedule-table bells-table">
+            <tr><td colspan="2" class="day-header">Расписание звонков</td></tr>
+            <tr><td><span class="lesson-time">1 урок</span></td><td>8:10-8:50</td></tr>
+            <tr><td><span class="break-time">Перемена</span></td><td>10 мин</td></tr>
+            <tr><td><span class="lesson-time">2 урок</span></td><td>9:00-9:40</td></tr>
+            <tr><td><span class="break-time">Перемена</span></td><td>10 мин</td></tr>
+            <tr><td><span class="lesson-time">3 урок</span></td><td>9:50-10:30</td></tr>
+            <tr><td><span class="break-time">Перемена</span></td><td>20 мин</td></tr>
+            <tr><td><span class="lesson-time">4 урок</span></td><td>10:50-11:30</td></tr>
+            <tr><td><span class="break-time">Перемена</span></td><td>10 мин</td></tr>
+            <tr><td><span class="lesson-time">5 урок</span></td><td>11:40-12:20</td></tr>
+            <tr><td><span class="break-time">Перемена</span></td><td>10 мин</td></tr>
+            <tr><td><span class="lesson-time">6 урок</span></td><td>12:30-13:10</td></tr>
+            <tr><td><span class="break-time">Перемена</span></td><td>10 мин</td></tr>
+            <tr><td><span class="lesson-time">7 урок</span></td><td>13:20-14:00</td></tr>
+            <tr><td><span class="break-time">Перемена</span></td><td>10 мин</td></tr>
+            <tr><td><span class="lesson-time">8 урок</span></td><td>14:10-14:50</td></tr>
+            <tr><td><span class="break-time">Перемена</span></td><td>10 мин</td></tr>
+            <tr><td><span class="lesson-time">9 урок</span></td><td>15:00-15:40</td></tr>
+            <tr><td><span class="break-time">Перемена</span></td><td>10 мин</td></tr>
+            <tr><td><span class="lesson-time">10 урок</span></td><td>15:50-16:30</td></tr>
+        </table>
+    </div>
 
-        contactButton.addEventListener('click', () => {
-            // Добавляем класс к body, чтобы запретить скролл
-            document.body.classList.add('overflow-hidden');
-            contactModal.classList.remove('hidden');
-            // Принудительная перерисовка для плавной анимации
-            contactModal.offsetWidth; 
-            contactModal.classList.remove('opacity-0');
-            contactModal.classList.add('opacity-100');
+</div>
+
+<script>
+    function showSchedule(classId) {
+        // Скрываем все расписания
+        const schedules = document.querySelectorAll('.class-schedule');
+        schedules.forEach(schedule => {
+            schedule.classList.remove('visible');
         });
 
-        backButton.addEventListener('click', () => {
-            contactModal.classList.remove('opacity-100');
-            contactModal.classList.add('opacity-0');
-            
-            setTimeout(() => {
-                contactModal.classList.add('hidden');
-                // Удаляем класс с body, чтобы снова разрешить скролл
-                document.body.classList.remove('overflow-hidden');
-            }, 300); // Задержка соответствует длительности анимации
+        // Показываем выбранное расписание
+        const activeSchedule = document.getElementById(classId);
+        if (activeSchedule) {
+            activeSchedule.classList.add('visible');
+        }
+
+        // Обновляем состояние кнопок
+        const buttons = document.querySelectorAll('.class-selector button');
+        buttons.forEach(button => {
+            button.classList.remove('active');
         });
-    </script>
+        document.querySelector(`[onclick="showSchedule('${classId}')"]`).classList.add('active');
+    }
+
+    // Инициализация: убеждаемся, что при загрузке страницы показан только первый класс
+    document.addEventListener('DOMContentLoaded', () => {
+        showSchedule('10-tech');
+    });
+</script>
 
 </body>
 </html>
