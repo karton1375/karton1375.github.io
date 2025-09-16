@@ -813,7 +813,7 @@
 
         for (let i = 0; i < bellSchedule.length; i++) {
             const period = bellSchedule[i];
-            const isLessonPeriod = (i % 2 === 0); // Четные индексы - уроки, нечетные - перемены
+            const isLessonPeriod = (i % 2 === 0);
 
             if (totalMinutes >= period.start && totalMinutes < period.end) {
                 if (isLessonPeriod) {
@@ -825,7 +825,7 @@
                         currentLesson: currentLessonName,
                         nextLesson: nextLessonName
                     };
-                } else { // Это перемена
+                } else {
                     const lessonIndexBeforeBreak = (i - 1) / 2;
                     const nextLessonName = currentDaySchedule[lessonIndexBeforeBreak + 1] || '(нет)';
                     if (nextLessonName === '(нет)') {
@@ -845,7 +845,6 @@
             }
         }
 
-        // Если время до первого урока
         if (totalMinutes < bellSchedule[0].start) {
             const nextLessonName = currentDaySchedule[0] || '(нет)';
             if (nextLessonName === '(нет)') {
@@ -863,7 +862,6 @@
             }
         }
 
-        // Если уроки уже закончились
         return {
             text: 'На сегодня уроки закончились',
             currentLesson: null,
@@ -916,8 +914,6 @@
     });
 
     window.addEventListener('resize', () => {
-        // При изменении размера экрана (например, при повороте телефона)
-        // нужно заново рассчитать положение ползунка
         const activeBtn = document.querySelector('.class-selector button.active');
         if (activeBtn) {
             showSchedule(activeBtn.getAttribute('onclick').replace("showSchedule('", "").replace("')", ""));
