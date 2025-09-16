@@ -13,6 +13,9 @@
             --text-secondary-color: #b0b0b0;
             --border-radius-large: 28px;
             --border-radius-small: 16px;
+            /* Переменные для анимации ползунка */
+            --slider-width: 0;
+            --slider-transform: 0;
         }
         body {
             font-family: 'Roboto', sans-serif;
@@ -47,6 +50,10 @@
             gap: 10px;
             margin-bottom: 20px;
             flex-wrap: wrap;
+            position: relative;
+            background-color: #4a4a4a;
+            border-radius: var(--border-radius-small);
+            padding: 5px;
         }
         .class-selector button {
             border: none;
@@ -55,37 +62,49 @@
             font-size: 16px;
             font-weight: 500;
             cursor: pointer;
-            transition: background-color 0.3s, transform 0.1s, color 0.3s;
+            transition: color 0.3s;
+            background: transparent;
+            color: var(--text-color);
+            z-index: 2;
+            position: relative;
+        }
+        
+        /* Стили для ползунка */
+        .class-selector .slider {
+            position: absolute;
+            height: calc(100% - 10px);
+            background-color: var(--primary-color);
+            border-radius: var(--border-radius-small);
+            transition: transform 0.3s, width 0.3s, background-color 0.3s;
+            z-index: 1;
+            top: 5px;
+            left: 0; /* Начальная позиция */
+            transform: translateX(var(--slider-transform));
+            width: var(--slider-width);
         }
         
         /* Цвета для классов "тех" */
-        .class-selector .btn-tech {
-            background-color: #4a4a4a;
-            color: #a4c9f7;
-        }
         .class-selector .btn-tech.active {
-            background-color: #a4c9f7;
             color: #3b3b3d;
+        }
+        .class-selector .slider.tech-color {
+            background-color: #a4c9f7;
         }
         
         /* Цвета для классов "ест" */
-        .class-selector .btn-est {
-            background-color: #4a4a4a;
-            color: #4CAF50;
-        }
         .class-selector .btn-est.active {
-            background-color: #4CAF50;
             color: #fff;
+        }
+        .class-selector .slider.est-color {
+            background-color: #4CAF50;
         }
 
         /* Цвета для расписания звонков (красный) */
-        .class-selector .btn-bells {
-            background-color: #4a4a4a;
-            color: #FF5252;
-        }
         .class-selector .btn-bells.active {
-            background-color: #FF5252;
             color: #fff;
+        }
+        .class-selector .slider.bells-color {
+            background-color: #FF5252;
         }
 
         .schedule-container {
@@ -109,10 +128,10 @@
         }
         
         .lessons-list {
-            list-style: none; /* Убираем стандартные маркеры */
+            list-style: none;
             padding: 0;
             margin: 0;
-            counter-reset: lesson-counter; /* Сбрасываем счетчик для каждого списка */
+            counter-reset: lesson-counter;
         }
         
         .lessons-list li {
@@ -172,7 +191,6 @@
             color: #4CAF50;
         }
 
-        /* Стили для всплывающего предупреждения */
         .alert-container {
             position: fixed;
             bottom: 20px;
@@ -203,7 +221,6 @@
             }
         }
         
-        /* Стили для блока с часами и датой */
         .time-container {
             background-color: #3b3b3d;
             border-radius: var(--border-radius-small);
@@ -211,6 +228,10 @@
             margin-bottom: 20px;
             text-align: center;
             color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
         .time-container #current-time {
             font-size: 24px;
@@ -219,8 +240,75 @@
         }
         .time-container #current-date {
             font-size: 14px;
-            margin-top: 5px;
             color: var(--text-secondary-color);
+            margin-top: 5px;
+        }
+        .lesson-info {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-color);
+            text-align: center;
+            margin-top: 10px;
+            width: 100%;
+        }
+        .lesson-info .lesson-title {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        .lesson-info .next-lesson-title {
+            color: var(--text-secondary-color);
+            font-style: italic;
+        }
+        
+        /* Адаптивные стили для мобильных устройств */
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+            .container {
+                padding: 16px;
+            }
+            h1 {
+                font-size: 20px;
+            }
+            .class-selector {
+                flex-direction: column;
+                gap: 5px;
+                padding: 5px;
+            }
+            .class-selector button {
+                width: 100%;
+                text-align: center;
+            }
+            /* Ползунок не работает на мобильных, поэтому скрываем его */
+            .class-selector .slider {
+                display: none;
+            }
+            /* Просто подсвечиваем активную кнопку на мобильных */
+            .class-selector button.active {
+                background-color: #a4c9f7;
+                color: #3b3b3d;
+            }
+            .class-selector .btn-est.active {
+                background-color: #4CAF50;
+                color: #fff;
+            }
+            .class-selector .btn-bells.active {
+                background-color: #FF5252;
+                color: #fff;
+            }
+            .day-header {
+                font-size: 16px;
+                padding: 12px 16px;
+            }
+            .lessons-list li {
+                font-size: 14px;
+                padding: 10px 12px;
+            }
+            .bells-table td {
+                font-size: 16px;
+                padding: 10px 12px;
+            }
         }
     </style>
 </head>
@@ -231,12 +319,13 @@
     <div class="time-container">
         <div id="current-time"></div>
         <div id="current-date"></div>
+        <div class="lesson-info" id="lesson-info"></div>
     </div>
     
     <h1>Расписание</h1>
 
     <div class="class-selector">
-        <button onclick="showSchedule('10-tech')" class="btn-tech">10 тех</button>
+        <div class="slider" id="slider"></div> <button onclick="showSchedule('10-tech')" class="btn-tech">10 тех</button>
         <button onclick="showSchedule('10-est')" class="btn-est">10 ест</button>
         <button onclick="showSchedule('11-tech')" class="btn-tech">11 тех</button>
         <button onclick="showSchedule('11-est')" class="btn-est">11 ест</button>
@@ -555,9 +644,43 @@
 <div id="alert" class="alert-container"></div>
 
 <script>
+    const schedules = {
+        '10-tech': [
+            ['РОВ', 'Физ-ра', 'физика', 'Алгебра', 'История', 'Литература', 'ПРЗ физ', 'проект', 'Прз инф'],
+            ['География', 'Алгебра', 'Русский яз.', 'Физика', 'Физика', 'Иностранный', 'Физ-ра'],
+            ['Информатика', 'Геометр', 'Литература', 'Химия', 'Вер и стат.', 'ОБЗР', 'Обществознание', 'ПРЗ мат', 'ОФП'],
+            ['Иностранный', 'История', 'Физика', 'Обществознание', 'Алгебра', 'Русский', 'Геометр', 'РМГ'],
+            ['Иностранный', 'Алгебра', 'Физика', 'Литература', 'Геометр', 'Биолог', 'ПРЗ инф', 'Функц. гр.', 'черчение'],
+        ],
+        '10-est': [
+            ['РОВ', 'физ-ра', 'химия', 'Алгебра', 'История', 'Литература', 'Проект б/б', 'Хим в зад', 'Тр в биол'],
+            ['Алгебра', 'химия', 'Биолог', 'Химия', '(нет)', 'физ-ра', 'БСИЗ', 'Культура речи'],
+            ['(нет)', 'химия', 'Алгебра', '(нет)', '(нет)', 'Геометр.', '(нет)', 'Тр в хим', '(нет)'],
+            ['(нет)', '(нет)', 'Биолог', 'ПРЗ Хим', 'Алгебра', '(нет)', 'Физика', 'Литература', 'РМГ'],
+            ['(нет)', 'геометр', 'Биопракт', '(нет)', 'Физика', '(нет)', 'Тр в био', 'Сл в мат'],
+        ],
+        '11-tech': [
+            ['РОВ', 'Физика', 'Иностр. яз.', 'Алгебра', 'геометр.', 'Реш. мат.', 'Культура речи', 'ОФП'],
+            ['Литература', 'Физика', 'Русский яз.', 'Алгебра', 'Информатика', 'Иностранный', 'Проект', 'ПРЗ инф'],
+            ['Физ-ра', 'Физика', 'Физика', '(нет)', 'Обществознание', 'ПРЗ физ', 'ОБЗР', '(нет)', '(нет)'],
+            ['Вер и стат.', 'Алгебра', 'Геометр.', 'Биолог.', 'Русский', 'Физика', 'Литература', 'РМГ'],
+            ['Физ-ра', 'Иностранный', 'Химия', 'Алгебра', 'Обществознание', 'геометр', 'География', 'ПРЗ инф', 'Функц гр', 'черчение'],
+        ],
+        '11-est': [
+            ['РОВ', 'Химия', 'Иностр. яз.', 'биолог', 'БСИЗ', 'Проект б/б', 'Культура речи', 'ОФП'],
+            ['Литература', 'Химия', 'Биолог.', 'Биолог.', '(нет)', '(нет)', 'Функц. гр.', 'Хим в зад'],
+            ['(нет)', 'химия', 'Алгебра', '(нет)', '(нет)', 'Геометр.', '(нет)', 'Тр в хим', '(нет)'],
+            ['(нет)', '(нет)', 'Биолог', 'ПРЗ Хим', 'Алгебра', '(нет)', 'Физика', 'Литература', 'РМГ'],
+            ['(нет)', 'геометр', 'Биопракт', '(нет)', 'Физика', '(нет)', 'Тр в био', 'Сл в мат'],
+        ]
+    };
+
+    let currentClass = '10-tech'; // Класс по умолчанию
+
     function showSchedule(classId) {
-        const schedules = document.querySelectorAll('.class-schedule');
-        schedules.forEach(schedule => {
+        currentClass = classId;
+        const scheduleElements = document.querySelectorAll('.class-schedule');
+        scheduleElements.forEach(schedule => {
             schedule.classList.remove('visible');
         });
 
@@ -570,7 +693,37 @@
         buttons.forEach(button => {
             button.classList.remove('active');
         });
-        document.querySelector(`[onclick="showSchedule('${classId}')"]`).classList.add('active');
+        const activeButton = document.querySelector(`[onclick="showSchedule('${classId}')"]`);
+        activeButton.classList.add('active');
+
+        // Обновляем позицию и цвет ползунка
+        const root = document.documentElement;
+        const sliderContainer = document.querySelector('.class-selector');
+        const buttonRect = activeButton.getBoundingClientRect();
+        const containerRect = sliderContainer.getBoundingClientRect();
+        
+        // Пересчитываем положение и ширину для ползунка
+        const sliderWidth = buttonRect.width;
+        const sliderTransform = buttonRect.left - containerRect.left;
+        
+        root.style.setProperty('--slider-width', `${sliderWidth}px`);
+        root.style.setProperty('--slider-transform', `${sliderTransform}px`);
+        
+        // Удаляем старые классы цветов
+        const slider = document.getElementById('slider');
+        slider.classList.remove('tech-color', 'est-color', 'bells-color');
+        
+        // Добавляем новый класс цвета в зависимости от класса
+        if (classId.includes('tech')) {
+            slider.classList.add('tech-color');
+        } else if (classId.includes('est')) {
+            slider.classList.add('est-color');
+        } else if (classId.includes('bells')) {
+            slider.classList.add('bells-color');
+        }
+
+        // Обновляем информацию об уроках при смене класса
+        updateLessonInfo();
     }
 
     function checkAndShowAlert() {
@@ -601,6 +754,137 @@
         }
     }
 
+    function getLessonInfo(date) {
+        const day = date.getDay();
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+
+        // Выходные дни (суббота и воскресенье)
+        if (day === 0 || day === 6) {
+            return {
+                text: 'Сегодня выходной',
+                currentLesson: null,
+                nextLesson: null
+            };
+        }
+
+        // Если выбран режим "Расписание звонков", то ничего не показываем
+        if (currentClass === 'bells') {
+            return {
+                text: '',
+                currentLesson: null,
+                nextLesson: null
+            };
+        }
+
+        const totalMinutes = hours * 60 + minutes;
+
+        const bellSchedule = [
+            { start: 8*60 + 10, end: 8*60 + 50 }, // 1 урок
+            { start: 8*60 + 50, end: 9*60 + 0 },  // Перемена после 1
+            { start: 9*60 + 0,  end: 9*60 + 40 },  // 2 урок
+            { start: 9*60 + 40, end: 9*60 + 50 },  // Перемена после 2
+            { start: 9*60 + 50, end: 10*60 + 30 }, // 3 урок
+            { start: 10*60 + 30, end: 10*60 + 50 },// Перемена после 3 (большая)
+            { start: 10*60 + 50, end: 11*60 + 30 },// 4 урок
+            { start: 11*60 + 30, end: 11*60 + 40 },// Перемена после 4
+            { start: 11*60 + 40, end: 12*60 + 20 },// 5 урок
+            { start: 12*60 + 20, end: 12*60 + 30 },// Перемена после 5
+            { start: 12*60 + 30, end: 13*60 + 10 },// 6 урок
+            { start: 13*60 + 10, end: 13*60 + 20 },// Перемена после 6
+            { start: 13*60 + 20, end: 14*60 + 0 }, // 7 урок
+            { start: 14*60 + 0,  end: 14*60 + 10 },// Перемена после 7
+            { start: 14*60 + 10, end: 14*60 + 50 },// 8 урок
+            { start: 14*60 + 50, end: 15*60 + 0 }, // Перемена после 8
+            { start: 15*60 + 0,  end: 15*60 + 40 }, // 9 урок
+            { start: 15*60 + 40, end: 15*60 + 50 },// Перемена после 9
+            { start: 15*60 + 50, end: 16*60 + 30 } // 10 урок
+        ];
+
+        const currentDaySchedule = schedules[currentClass][day - 1];
+        
+        if (!currentDaySchedule) {
+            return {
+                text: 'На сегодня расписания нет',
+                currentLesson: null,
+                nextLesson: null
+            };
+        }
+
+        for (let i = 0; i < bellSchedule.length; i++) {
+            const period = bellSchedule[i];
+            const isLessonPeriod = (i % 2 === 0); // Четные индексы - уроки, нечетные - перемены
+
+            if (totalMinutes >= period.start && totalMinutes < period.end) {
+                if (isLessonPeriod) {
+                    const lessonIndex = i / 2;
+                    const currentLessonName = currentDaySchedule[lessonIndex] || '(нет)';
+                    const nextLessonName = currentDaySchedule[lessonIndex + 1] || '(нет)';
+                    return {
+                        text: `Идет урок: <span class="lesson-title">${currentLessonName}</span>`,
+                        currentLesson: currentLessonName,
+                        nextLesson: nextLessonName
+                    };
+                } else { // Это перемена
+                    const lessonIndexBeforeBreak = (i - 1) / 2;
+                    const nextLessonName = currentDaySchedule[lessonIndexBeforeBreak + 1] || '(нет)';
+                    if (nextLessonName === '(нет)') {
+                         return {
+                            text: 'Перемена',
+                            currentLesson: null,
+                            nextLesson: null
+                        };
+                    } else {
+                        return {
+                            text: `Перемена. Следующий: <span class="next-lesson-title">${nextLessonName}</span>`,
+                            currentLesson: null,
+                            nextLesson: nextLessonName
+                        };
+                    }
+                }
+            }
+        }
+
+        // Если время до первого урока
+        if (totalMinutes < bellSchedule[0].start) {
+            const nextLessonName = currentDaySchedule[0] || '(нет)';
+            if (nextLessonName === '(нет)') {
+                return {
+                    text: 'Уроки скоро начнутся',
+                    currentLesson: null,
+                    nextLesson: null
+                };
+            } else {
+                return {
+                    text: `Скоро 1-й урок: <span class="next-lesson-title">${nextLessonName}</span>`,
+                    currentLesson: null,
+                    nextLesson: nextLessonName
+                };
+            }
+        }
+
+        // Если уроки уже закончились
+        return {
+            text: 'На сегодня уроки закончились',
+            currentLesson: null,
+            nextLesson: null
+        };
+    }
+
+    function updateLessonInfo() {
+        const now = new Date();
+        const lessonInfoElement = document.getElementById('lesson-info');
+        const lessonData = getLessonInfo(now);
+
+        lessonInfoElement.innerHTML = lessonData.text;
+    }
+
+    function updateAll() {
+        updateDateTime();
+        updateLessonInfo();
+        checkAndShowAlert();
+    }
+
     function updateDateTime() {
         const now = new Date();
         const timeElement = document.getElementById('current-time');
@@ -627,9 +911,17 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         showSchedule('10-tech');
-        checkAndShowAlert();
-        updateDateTime(); // Первоначальный вызов
-        setInterval(updateDateTime, 1000); // Обновляем каждую секунду
+        updateAll();
+        setInterval(updateAll, 1000); // Обновляем каждую секунду
+    });
+
+    window.addEventListener('resize', () => {
+        // При изменении размера экрана (например, при повороте телефона)
+        // нужно заново рассчитать положение ползунка
+        const activeBtn = document.querySelector('.class-selector button.active');
+        if (activeBtn) {
+            showSchedule(activeBtn.getAttribute('onclick').replace("showSchedule('", "").replace("')", ""));
+        }
     });
 </script>
 
