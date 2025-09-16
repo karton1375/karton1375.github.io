@@ -259,6 +259,14 @@
             color: var(--text-secondary-color);
             font-style: italic;
         }
+
+        .iframe-container {
+            display: none;
+            text-align: center;
+        }
+        .iframe-container.visible {
+            display: block;
+        }
         
         /* Адаптивные стили для мобильных устройств */
         @media (max-width: 768px) {
@@ -329,7 +337,7 @@
         <button onclick="showSchedule('10-est')" class="btn-est">10 ест</button>
         <button onclick="showSchedule('11-tech')" class="btn-tech">11 тех</button>
         <button onclick="showSchedule('11-est')" class="btn-est">11 ест</button>
-        <button onclick="showSchedule('bells')" class="btn-bells">Расписание звонков</button>
+        <button onmousedown="handleHold()" onmouseup="handleRelease('bells')" ontouchstart="handleHold()" ontouchend="handleRelease('bells')" class="btn-bells">Расписание звонков</button>
     </div>
 
     <div id="10-tech" class="class-schedule">
@@ -638,6 +646,9 @@
             <tr><td><span class="lesson-time">10 урок</span></td><td>15:50-16:30</td></tr>
         </table>
     </div>
+    <div id="iframe-container" class="iframe-container">
+        <iframe width="110" height="200" src="https://www.myinstants.com/instant/ack-87763/embed/" frameborder="0" scrolling="no"></iframe>
+    </div>
 
 </div>
 
@@ -676,10 +687,12 @@
     };
 
     let currentClass = '10-tech'; // Класс по умолчанию
+    let holdTimeout;
+    const holdDelay = 1500; // Удержание в миллисекундах для звука
 
     function showSchedule(classId) {
         currentClass = classId;
-        const scheduleElements = document.querySelectorAll('.class-schedule');
+        const scheduleElements = document.querySelectorAll('.class-schedule, .iframe-container');
         scheduleElements.forEach(schedule => {
             schedule.classList.remove('visible');
         });
@@ -693,38 +706,90 @@
         buttons.forEach(button => {
             button.classList.remove('active');
         });
-        const activeButton = document.querySelector(`[onclick="showSchedule('${classId}')"]`);
-        activeButton.classList.add('active');
+        const activeButton = document.querySelector(`[onclick="showSchedule('${classId}')"]`) || document.querySelector(`[ontouchend*="'${classId}'"]`);
+        if (activeButton) {
+            activeButton.classList.add('active');
+        }
 
         // Обновляем позицию и цвет ползунка
         const root = document.documentElement;
         const sliderContainer = document.querySelector('.class-selector');
-        const buttonRect = activeButton.getBoundingClientRect();
-        const containerRect = sliderContainer.getBoundingClientRect();
-        
-        // Пересчитываем положение и ширину для ползунка
-        const sliderWidth = buttonRect.width;
-        const sliderTransform = buttonRect.left - containerRect.left;
-        
-        root.style.setProperty('--slider-width', `${sliderWidth}px`);
-        root.style.setProperty('--slider-transform', `${sliderTransform}px`);
-        
-        // Удаляем старые классы цветов
-        const slider = document.getElementById('slider');
-        slider.classList.remove('tech-color', 'est-color', 'bells-color');
-        
-        // Добавляем новый класс цвета в зависимости от класса
-        if (classId.includes('tech')) {
-            slider.classList.add('tech-color');
-        } else if (classId.includes('est')) {
-            slider.classList.add('est-color');
-        } else if (classId.includes('bells')) {
-            slider.classList.add('bells-color');
+        if (activeButton && sliderContainer) {
+            const buttonRect = activeButton.getBoundingClientRect();
+            const containerRect = sliderContainer.getBoundingClientRect();
+            
+            // Пересчитываем положение и ширину для ползунка
+            const sliderWidth = buttonRect.width;
+            const sliderTransform = buttonRect.left - containerRect.left;
+            
+            root.style.setProperty('--slider-width', `${sliderWidth}px`);
+            root.style.setProperty('--slider-transform', `${sliderTransform}px`);
+            
+            // Удаляем старые классы цветов
+            const slider = document.getElementById('slider');
+            if (slider) {
+                slider.classList.remove('tech-color', 'est-color', 'bells-color');
+                
+                // Добавляем новый класс цвета в зависимости от класса
+                if (classId.includes('tech')) {
+                    slider.classList.add('tech-color');
+                } else if (classId.includes('est')) {
+                    slider.classList.add('est-color');
+                } else if (classId.includes('bells')) {
+                    slider.classList.add('bells-color');
+                }
+            }
         }
-
+        
         // Обновляем информацию об уроках при смене класса
         updateLessonInfo();
     }
+
+    function handleHold() {
+        holdTimeout = setTimeout(() => {
+            // Показываем iframe, скрываем расписания
+            const scheduleElements = document.querySelectorAll('.class-schedule');
+            scheduleElements.forEach(schedule => {
+                schedule.classList.remove('visible');
+            });
+            document.getElementById('iframe-container').classList.add('visible');
+
+            // Обновляем кнопку
+            const buttons = document.querySelectorAll('.class-selector button');
+            buttons.forEach(button => {
+                button.classList.remove('active');
+            });
+            const bellsButton = document.querySelector('.btn-bells');
+            bellsButton.classList.add('active');
+            
+            // Обновляем ползунок
+            const root = document.documentElement;
+            const sliderContainer = document.querySelector('.class-selector');
+            if (bellsButton && sliderContainer) {
+                const buttonRect = bellsButton.getBoundingClientRect();
+                const containerRect = sliderContainer.getBoundingClientRect();
+                const sliderWidth = buttonRect.width;
+                const sliderTransform = buttonRect.left - containerRect.left;
+                root.style.setProperty('--slider-width', `${sliderWidth}px`);
+                root.style.setProperty('--slider-transform', `${sliderTransform}px`);
+                const slider = document.getElementById('slider');
+                if (slider) {
+                    slider.classList.remove('tech-color', 'est-color', 'bells-color');
+                    slider.classList.add('bells-color');
+                }
+            }
+            // Сбрасываем holdTimeout, чтобы не сработало handleRelease
+            holdTimeout = null; 
+        }, holdDelay);
+    }
+
+    function handleRelease(classId) {
+        clearTimeout(holdTimeout);
+        if (holdTimeout !== null) {
+            showSchedule(classId);
+        }
+    }
+
 
     function checkAndShowAlert() {
         const date = new Date();
