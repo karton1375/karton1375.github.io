@@ -169,13 +169,70 @@
         }
         .bells-table .break-time {
             font-style: italic;
-            color: #4CAF50; /* Изменен цвет на зеленый */
+            color: #4CAF50;
+        }
+
+        /* Стили для всплывающего предупреждения */
+        .alert-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ff5252;
+            color: #fff;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+            font-size: 16px;
+            font-weight: bold;
+            animation: slideIn 0.5s ease-out;
+        }
+        .alert-container.show {
+            display: block;
+        }
+        @keyframes slideIn {
+            from {
+                bottom: -50px;
+                opacity: 0;
+            }
+            to {
+                bottom: 20px;
+                opacity: 1;
+            }
+        }
+        
+        /* Стили для блока с часами и датой */
+        .time-container {
+            background-color: #3b3b3d;
+            border-radius: var(--border-radius-small);
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--text-color);
+        }
+        .time-container #current-time {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0;
+        }
+        .time-container #current-date {
+            font-size: 14px;
+            margin-top: 5px;
+            color: var(--text-secondary-color);
         }
     </style>
 </head>
 <body>
 
 <div class="container">
+    
+    <div class="time-container">
+        <div id="current-time"></div>
+        <div id="current-date"></div>
+    </div>
+    
     <h1>Расписание</h1>
 
     <div class="class-selector">
@@ -495,6 +552,8 @@
 
 </div>
 
+<div id="alert" class="alert-container"></div>
+
 <script>
     function showSchedule(classId) {
         const schedules = document.querySelectorAll('.class-schedule');
@@ -514,8 +573,63 @@
         document.querySelector(`[onclick="showSchedule('${classId}')"]`).classList.add('active');
     }
 
+    function checkAndShowAlert() {
+        const date = new Date();
+        const dayOfWeek = date.getDay(); // 0 = Воскресенье, 1 = Понедельник, 5 = Пятница
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+        const alertElement = document.getElementById('alert');
+        
+        let message = '';
+
+        // Понедельник
+        if (dayOfWeek === 1 && (hours < 8 || (hours === 8 && minutes < 10))) {
+            message = 'Сегодня линейка в 8:05';
+        } 
+        
+        // Пятница
+        else if (dayOfWeek === 5 && (hours > 12 || (hours === 12 && minutes >= 0)) && (hours < 12 || (hours === 12 && minutes <= 25))) {
+            message = 'Сегодня линейка в 12:20';
+        }
+        
+        if (message) {
+            alertElement.textContent = message;
+            alertElement.classList.add('show');
+            setTimeout(() => {
+                alertElement.classList.remove('show');
+            }, 5000); // Скрываем через 5 секунд
+        }
+    }
+
+    function updateDateTime() {
+        const now = new Date();
+        const timeElement = document.getElementById('current-time');
+        const dateElement = document.getElementById('current-date');
+
+        const days = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
+        const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+
+        const dayName = days[now.getDay()];
+        const monthName = months[now.getMonth()];
+
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        const timeString = `${hours}:${minutes}:${seconds}`;
+
+        const day = now.getDate().toString().padStart(2, '0');
+        const year = now.getFullYear();
+        const dateString = `${dayName}, ${day} ${monthName} ${year} года`;
+
+        timeElement.textContent = timeString;
+        dateElement.textContent = dateString;
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         showSchedule('10-tech');
+        checkAndShowAlert();
+        updateDateTime(); // Первоначальный вызов
+        setInterval(updateDateTime, 1000); // Обновляем каждую секунду
     });
 </script>
 
