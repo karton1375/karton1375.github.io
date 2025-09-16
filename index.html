@@ -91,65 +91,77 @@
         .schedule-container {
             width: 100%;
         }
-        .schedule-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0 10px;
+
+        .day-schedule {
+            margin-bottom: 20px;
         }
-        .schedule-table th, .schedule-table td {
-            text-align: left;
-            padding: 12px 16px;
-            background-color: var(--bg-color);
-            border-radius: var(--border-radius-small);
-            font-size: 16px;
-            color: var(--text-secondary-color);
-        }
-        .schedule-table th {
-            font-weight: 600;
-            color: var(--primary-color);
-            font-size: 14px;
-            text-transform: uppercase;
-            padding: 16px;
-            background-color: #3b3b3d;
-            border-radius: var(--border-radius-small);
-        }
+
         .day-header {
             font-weight: 600;
-            color: var(--surface-color);
+            color: var(--text-color);
             font-size: 18px;
             text-transform: capitalize;
-            background-color: var(--primary-color);
+            background-color: #3b3b3d;
             border-radius: var(--border-radius-small);
+            text-align: left;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+        }
+        
+        .lessons-list {
+            list-style: none; /* Убираем стандартные маркеры */
+            padding: 0;
+            margin: 0;
+            counter-reset: lesson-counter; /* Сбрасываем счетчик для каждого списка */
+        }
+        
+        .lessons-list li {
+            position: relative;
+            background-color: var(--bg-color);
+            border-radius: var(--border-radius-small);
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: var(--text-secondary-color);
             text-align: center;
-            padding-top: 15px;
-            padding-bottom: 15px;
         }
-        @media (max-width: 768px) {
-            .container {
-                padding: 16px;
-            }
-            .schedule-table th, .schedule-table td {
-                padding: 8px 12px;
-            }
-            body {
-                padding: 12px;
-            }
+        
+        .lessons-list li::before {
+            counter-increment: lesson-counter;
+            content: counter(lesson-counter) ".";
+            color: var(--text-color); /* Изменен цвет цифр на белый */
+            font-weight: bold;
+            position: absolute;
+            left: 20px;
         }
+        
+        .empty-cell {
+            font-style: italic;
+            opacity: 0.6;
+        }
+
         .class-schedule {
             display: none;
         }
         .class-schedule.visible {
             display: block;
         }
-        .empty-cell {
-            font-style: italic;
-            opacity: 0.6;
-        }
 
+        .bells-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
         .bells-table td {
             text-align: center;
             color: var(--text-color);
             font-size: 18px;
+            padding: 12px 16px;
+            background-color: var(--bg-color);
+            border-radius: var(--border-radius-small);
+        }
+        .bells-table .day-header {
+            margin-bottom: 10px;
         }
         .bells-table .lesson-time {
             font-weight: 600;
@@ -175,219 +187,290 @@
     </div>
 
     <div id="10-tech" class="class-schedule">
-        <table class="schedule-table">
-            <tr><td colspan="1" class="day-header">Понедельник</td></tr>
-            <tr><td>РОВ</td></tr>
-            <tr><td>Физ-ра</td></tr>
-            <tr><td>физика</td></tr>
-            <tr><td>Алгебра</td></tr>
-            <tr><td>История</td></tr>
-            <tr><td>Литература</td></tr>
-            <tr><td>ПРЗ физ</td></tr>
-            <tr><td>проект</td></tr>
-            <tr><td>Прз инф</td></tr>
-            <tr><td colspan="1" class="day-header">Вторник</td></tr>
-            <tr><td>География</td></tr>
-            <tr><td>Алгебра</td></tr>
-            <tr><td>Русский яз.</td></tr>
-            <tr><td>Физика</td></tr>
-            <tr><td>Физика</td></tr>
-            <tr><td>Иностранный</td></tr>
-            <tr><td>Физ-ра</td></tr>
-            <tr><td colspan="1" class="day-header">Среда</td></tr>
-            <tr><td>Информатика</td></tr>
-            <tr><td>Геометр</td></tr>
-            <tr><td>Литература</td></tr>
-            <tr><td>Химия</td></tr>
-            <tr><td>Вер и стат.</td></tr>
-            <tr><td>ОБЗР</td></tr>
-            <tr><td>Обществознание</td></tr>
-            <tr><td>ПРЗ мат</td></tr>
-            <tr><td>ОФП</td></tr>
-            <tr><td colspan="1" class="day-header">Четверг</td></tr>
-            <tr><td>Иностранный</td></tr>
-            <tr><td>История</td></tr>
-            <tr><td>Физика</td></tr>
-            <tr><td>Обществознание</td></tr>
-            <tr><td>Алгебра</td></tr>
-            <tr><td>Русский</td></tr>
-            <tr><td>Геометр</td></tr>
-            <tr><td>РМГ</td></tr>
-            <tr><td colspan="1" class="day-header">Пятница</td></tr>
-            <tr><td>Иностранный</td></tr>
-            <tr><td>Алгебра</td></tr>
-            <tr><td>Физика</td></tr>
-            <tr><td>Литература</td></tr>
-            <tr><td>Геометр</td></tr>
-            <tr><td>Биолог</td></tr>
-            <tr><td>ПРЗ инф</td></tr>
-            <tr><td>Функц. гр.</td></tr>
-            <tr><td>черчение</td></tr>
-        </table>
+        <div class="day-schedule">
+            <div class="day-header">Понедельник 📅</div>
+            <ol class="lessons-list">
+                <li>РОВ</li>
+                <li>Физ-ра</li>
+                <li>физика</li>
+                <li>Алгебра</li>
+                <li>История</li>
+                <li>Литература</li>
+                <li>ПРЗ физ</li>
+                <li>проект</li>
+                <li>Прз инф</li>
+            </ol>
+        </div>
+        <div class="day-schedule">
+            <div class="day-header">Вторник 📆</div>
+            <ol class="lessons-list">
+                <li>География</li>
+                <li>Алгебра</li>
+                <li>Русский яз.</li>
+                <li>Физика</li>
+                <li>Физика</li>
+                <li>Иностранный</li>
+                <li>Физ-ра</li>
+            </ol>
+        </div>
+        <div class="day-schedule">
+            <div class="day-header">Среда 🗓️</div>
+            <ol class="lessons-list">
+                <li>Информатика</li>
+                <li>Геометр</li>
+                <li>Литература</li>
+                <li>Химия</li>
+                <li>Вер и стат.</li>
+                <li>ОБЗР</li>
+                <li>Обществознание</li>
+                <li>ПРЗ мат</li>
+                <li>ОФП</li>
+            </ol>
+        </div>
+        <div class="day-schedule">
+            <div class="day-header">Четверг 📅</div>
+            <ol class="lessons-list">
+                <li>Иностранный</li>
+                <li>История</li>
+                <li>Физика</li>
+                <li>Обществознание</li>
+                <li>Алгебра</li>
+                <li>Русский</li>
+                <li>Геометр</li>
+                <li>РМГ</li>
+            </ol>
+        </div>
+        <div class="day-schedule">
+            <div class="day-header">Пятница 📆</div>
+            <ol class="lessons-list">
+                <li>Иностранный</li>
+                <li>Алгебра</li>
+                <li>Физика</li>
+                <li>Литература</li>
+                <li>Геометр</li>
+                <li>Биолог</li>
+                <li>ПРЗ инф</li>
+                <li>Функц. гр.</li>
+                <li>черчение</li>
+            </ol>
+        </div>
     </div>
     
     <div id="10-est" class="class-schedule">
-        <table class="schedule-table">
-            <tr><td colspan="1" class="day-header">Понедельник</td></tr>
-            <tr><td>РОВ</td></tr>
-            <tr><td>физ-ра</td></tr>
-            <tr><td>химия</td></tr>
-            <tr><td>Алгебра</td></tr>
-            <tr><td>История</td></tr>
-            <tr><td>Литература</td></tr>
-            <tr><td>Проект б/б</td></tr>
-            <tr><td>Хим в зад</td></tr>
-            <tr><td>Тр в биол</td></tr>
-            <tr><td colspan="1" class="day-header">Вторник</td></tr>
-            <tr><td>Алгебра</td></tr>
-            <tr><td>химия</td></tr>
-            <tr><td>Биолог</td></tr>
-            <tr><td>Химия</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td>физ-ра</td></tr>
-            <tr><td>БСИЗ</td></tr>
-            <tr><td>Культура речи</td></tr>
-            <tr><td colspan="1" class="day-header">Среда</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td>Алгебра</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td>Геометр</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td>Сл в мат</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td colspan="1" class="day-header">Четверг</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td>Биолог</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td>Физика</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td>Биолог</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td colspan="1" class="day-header">Пятница</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td>Геометр</td></tr>
-            <tr><td>ПРЗ Хим</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td>Физика</td></tr>
-            <tr><td>Биопракт</td></tr>
-            <tr><td>Функц гр</td></tr>
-            <tr><td>Тр в хим</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-        </table>
+        <div class="day-schedule">
+            <div class="day-header">Понедельник 📅</div>
+            <ol class="lessons-list">
+                <li>РОВ</li>
+                <li>физ-ра</li>
+                <li>химия</li>
+                <li>Алгебра</li>
+                <li>История</li>
+                <li>Литература</li>
+                <li>Проект б/б</li>
+                <li>Хим в зад</li>
+                <li>Тр в биол</li>
+            </ol>
+        </div>
+        <div class="day-schedule">
+            <div class="day-header">Вторник 📆</div>
+            <ol class="lessons-list">
+                <li>Алгебра</li>
+                <li>химия</li>
+                <li>Биолог</li>
+                <li>Химия</li>
+                <li class="empty-cell">(нет)</li>
+                <li>физ-ра</li>
+                <li>БСИЗ</li>
+                <li>Культура речи</li>
+            </ol>
+        </div>
+        <div class="day-schedule">
+            <div class="day-header">Среда 🗓️</div>
+            <ol class="lessons-list">
+                <li class="empty-cell">(нет)</li>
+                <li>химия</li>
+                <li>Алгебра</li>
+                <li class="empty-cell">(нет)</li>
+                <li class="empty-cell">(нет)</li>
+                <li>Геометр.</li>
+                <li class="empty-cell">(нет)</li>
+                <li>Тр в хим</li>
+                <li class="empty-cell">(нет)</li>
+            </ol>
+        </div>
+        <div class="day-schedule">
+            <div class="day-header">Четверг 📅</div>
+            <ol class="lessons-list">
+                <li class="empty-cell">(нет)</li>
+                <li class="empty-cell">(нет)</li>
+                <li>Биолог</li>
+                <li>ПРЗ Хим</li>
+                <li>Алгебра</li>
+                <li class="empty-cell">(нет)</li>
+                <li>Физика</li>
+                <li>Литература</li>
+                <li>РМГ</li>
+            </ol>
+        </div>
+        <div class="day-schedule">
+            <div class="day-header">Пятница 📆</div>
+            <ol class="lessons-list">
+                <li class="empty-cell">(нет)</li>
+                <li>геометр</li>
+                <li>Биопракт</li>
+                <li class="empty-cell">(нет)</li>
+                <li>Физика</li>
+                <li class="empty-cell">(нет)</li>
+                <li>Тр в био</li>
+                <li>Сл в мат</li>
+            </ol>
+        </div>
     </div>
 
     <div id="11-tech" class="class-schedule">
-        <table class="schedule-table">
-            <tr><td colspan="1" class="day-header">Понедельник</td></tr>
-            <tr><td>РОВ</td></tr>
-            <tr><td>Физика</td></tr>
-            <tr><td>Иностр. яз.</td></tr>
-            <tr><td>Алгебра</td></tr>
-            <tr><td>геометр.</td></tr>
-            <tr><td>Реш. мат.</td></tr>
-            <tr><td>Культура речи</td></tr>
-            <tr><td>ОФП</td></tr>
-            <tr><td colspan="1" class="day-header">Вторник</td></tr>
-            <tr><td>Литература</td></tr>
-            <tr><td>Физика</td></tr>
-            <tr><td>Русский яз.</td></tr>
-            <tr><td>Алгебра</td></tr>
-            <tr><td>Информатика</td></tr>
-            <tr><td>Иностранный</td></tr>
-            <tr><td>Проект</td></tr>
-            <tr><td>ПРЗ инф</td></tr>
-            <tr><td colspan="1" class="day-header">Среда</td></tr>
-            <tr><td>Физ-ра</td></tr>
-            <tr><td>Физика</td></tr>
-            <tr><td>Физика</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td>Обществознание</td></tr>
-            <tr><td>ПРЗ физ</td></tr>
-            <tr><td>ОБЗР</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td colspan="1" class="day-header">Четверг</td></tr>
-            <tr><td>Вер и стат.</td></tr>
-            <tr><td>Алгебра</td></tr>
-            <tr><td>Геометр.</td></tr>
-            <tr><td>Биолог.</td></tr>
-            <tr><td>Русский</td></tr>
-            <tr><td>Физика</td></tr>
-            <tr><td>Литература</td></tr>
-            <tr><td>РМГ</td></tr>
-            <tr><td colspan="1" class="day-header">Пятница</td></tr>
-            <tr><td>Физ-ра</td></tr>
-            <tr><td>Иностранный</td></tr>
-            <tr><td>Химия</td></tr>
-            <tr><td>Алгебра</td></tr>
-            <tr><td>Обществознание</td></tr>
-            <tr><td>геометр</td></tr>
-            <tr><td>География</td></tr>
-            <tr><td>ПРЗ инф</td></tr>
-            <tr><td>Функц гр</td></tr>
-            <tr><td>черчение</td></tr>
-        </table>
+        <div class="day-schedule">
+            <div class="day-header">Понедельник 📅</div>
+            <ol class="lessons-list">
+                <li>РОВ</li>
+                <li>Физика</li>
+                <li>Иностр. яз.</li>
+                <li>Алгебра</li>
+                <li>геометр.</li>
+                <li>Реш. мат.</li>
+                <li>Культура речи</li>
+                <li>ОФП</li>
+            </ol>
+        </div>
+        <div class="day-schedule">
+            <div class="day-header">Вторник 📆</div>
+            <ol class="lessons-list">
+                <li>Литература</li>
+                <li>Физика</li>
+                <li>Русский яз.</li>
+                <li>Алгебра</li>
+                <li>Информатика</li>
+                <li>Иностранный</li>
+                <li>Проект</li>
+                <li>ПРЗ инф</li>
+            </ol>
+        </div>
+        <div class="day-schedule">
+            <div class="day-header">Среда 🗓️</div>
+            <ol class="lessons-list">
+                <li>Физ-ра</li>
+                <li>Физика</li>
+                <li>Физика</li>
+                <li class="empty-cell">(нет)</li>
+                <li>Обществознание</li>
+                <li>ПРЗ физ</li>
+                <li>ОБЗР</li>
+                <li class="empty-cell">(нет)</li>
+                <li class="empty-cell">(нет)</li>
+            </ol>
+        </div>
+        <div class="day-schedule">
+            <div class="day-header">Четверг 📅</div>
+            <ol class="lessons-list">
+                <li>Вер и стат.</li>
+                <li>Алгебра</li>
+                <li>Геометр.</li>
+                <li>Биолог.</li>
+                <li>Русский</li>
+                <li>Физика</li>
+                <li>Литература</li>
+                <li>РМГ</li>
+            </ol>
+        </div>
+        <div class="day-schedule">
+            <div class="day-header">Пятница 📆</div>
+            <ol class="lessons-list">
+                <li>Физ-ра</li>
+                <li>Иностранный</li>
+                <li>Химия</li>
+                <li>Алгебра</li>
+                <li>Обществознание</li>
+                <li>геометр</li>
+                <li>География</li>
+                <li>ПРЗ инф</li>
+                <li>Функц гр</li>
+                <li>черчение</li>
+            </ol>
+        </div>
     </div>
 
     <div id="11-est" class="class-schedule">
-        <table class="schedule-table">
-            <tr><td colspan="1" class="day-header">Понедельник</td></tr>
-            <tr><td>РОВ</td></tr>
-            <tr><td>Химия</td></tr>
-            <tr><td>Иностр. яз.</td></tr>
-            <tr><td>биолог</td></tr>
-            <tr><td>БСИЗ</td></tr>
-            <tr><td>Проект б/б</td></tr>
-            <tr><td>Культура речи</td></tr>
-            <tr><td>ОФП</td></tr>
-            <tr><td colspan="1" class="day-header">Вторник</td></tr>
-            <tr><td>Литература</td></tr>
-            <tr><td>Химия</td></tr>
-            <tr><td>Биолог.</td></tr>
-            <tr><td>Биолог.</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td>Функц. гр.</td></tr>
-            <tr><td>Хим в зад</td></tr>
-            <tr><td colspan="1" class="day-header">Среда</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td>химия</td></tr>
-            <tr><td>Алгебра</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td>Геометр.</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td>Тр в хим</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td colspan="1" class="day-header">Четверг</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td>Биолог</td></tr>
-            <tr><td>ПРЗ Хим</td></tr>
-            <tr><td>Алгебра</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td>Физика</td></tr>
-            <tr><td>Литература</td></tr>
-            <tr><td>РМГ</td></tr>
-            <tr><td colspan="1" class="day-header">Пятница</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td>геометр</td></tr>
-            <tr><td>Биопракт</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td>Физика</td></tr>
-            <tr><td class="empty-cell">(нет)</td></tr>
-            <tr><td>Тр в био</td></tr>
-            <tr><td>Сл в мат</td></tr>
-        </table>
+        <div class="day-schedule">
+            <div class="day-header">Понедельник 📅</div>
+            <ol class="lessons-list">
+                <li>РОВ</li>
+                <li>Химия</li>
+                <li>Иностр. яз.</li>
+                <li>биолог</li>
+                <li>БСИЗ</li>
+                <li>Проект б/б</li>
+                <li>Культура речи</li>
+                <li>ОФП</li>
+            </ol>
+        </div>
+        <div class="day-schedule">
+            <div class="day-header">Вторник 📆</div>
+            <ol class="lessons-list">
+                <li>Литература</li>
+                <li>Химия</li>
+                <li>Биолог.</li>
+                <li>Биолог.</li>
+                <li class="empty-cell">(нет)</li>
+                <li class="empty-cell">(нет)</li>
+                <li>Функц. гр.</li>
+                <li>Хим в зад</li>
+            </ol>
+        </div>
+        <div class="day-schedule">
+            <div class="day-header">Среда 🗓️</div>
+            <ol class="lessons-list">
+                <li class="empty-cell">(нет)</li>
+                <li>химия</li>
+                <li>Алгебра</li>
+                <li class="empty-cell">(нет)</li>
+                <li class="empty-cell">(нет)</li>
+                <li>Геометр.</li>
+                <li class="empty-cell">(нет)</li>
+                <li>Тр в хим</li>
+                <li class="empty-cell">(нет)</li>
+            </ol>
+        </div>
+        <div class="day-schedule">
+            <div class="day-header">Четверг 📅</div>
+            <ol class="lessons-list">
+                <li class="empty-cell">(нет)</li>
+                <li class="empty-cell">(нет)</li>
+                <li>Биолог</li>
+                <li>ПРЗ Хим</li>
+                <li>Алгебра</li>
+                <li class="empty-cell">(нет)</li>
+                <li>Физика</li>
+                <li>Литература</li>
+                <li>РМГ</li>
+            </ol>
+        </div>
+        <div class="day-schedule">
+            <div class="day-header">Пятница 📆</div>
+            <ol class="lessons-list">
+                <li class="empty-cell">(нет)</li>
+                <li>геометр</li>
+                <li>Биопракт</li>
+                <li class="empty-cell">(нет)</li>
+                <li>Физика</li>
+                <li class="empty-cell">(нет)</li>
+                <li>Тр в био</li>
+                <li>Сл в мат</li>
+            </ol>
+        </div>
     </div>
 
     <div id="bells" class="class-schedule">
-        <table class="schedule-table bells-table">
-            <tr><td colspan="2" class="day-header">Расписание звонков</td></tr>
+        <table class="bells-table">
+            <tr><td colspan="2" class="day-header">Расписание звонков 🔔</td></tr>
             <tr><td><span class="lesson-time">1 урок</span></td><td>8:10-8:50</td></tr>
             <tr><td><span class="break-time">Перемена</span></td><td>10 мин</td></tr>
             <tr><td><span class="lesson-time">2 урок</span></td><td>9:00-9:40</td></tr>
@@ -414,19 +497,16 @@
 
 <script>
     function showSchedule(classId) {
-        // Скрываем все расписания
         const schedules = document.querySelectorAll('.class-schedule');
         schedules.forEach(schedule => {
             schedule.classList.remove('visible');
         });
 
-        // Показываем выбранное расписание
         const activeSchedule = document.getElementById(classId);
         if (activeSchedule) {
             activeSchedule.classList.add('visible');
         }
 
-        // Обновляем состояние кнопок
         const buttons = document.querySelectorAll('.class-selector button');
         buttons.forEach(button => {
             button.classList.remove('active');
@@ -434,7 +514,6 @@
         document.querySelector(`[onclick="showSchedule('${classId}')"]`).classList.add('active');
     }
 
-    // Инициализация: убеждаемся, что при загрузке страницы показан только первый класс
     document.addEventListener('DOMContentLoaded', () => {
         showSchedule('10-tech');
     });
